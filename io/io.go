@@ -1,7 +1,9 @@
 package main
 
 import (
+	"encoding/json"
 	"bytes"
+	"bufio"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -41,6 +43,12 @@ func main() {
 	reader = r1
 	// *file satisfies the io.Reader interface because it has a .Read() method
 
+	// Go supports buffered IO via package bufio which makes it easy to work with text.
+	// bufio.NewReader returns a new reader with default buffer size
+	bufioReader := bufio.NewReader(r1)
+	line, _ := bufioReader.ReadString('\n') // can read line by line
+	fmt.Println(line)
+
 	r2 := strings.NewReader("This reader will return this string as []bytes")
 	// r2 is a *Reader
 	reader = r2
@@ -65,7 +73,6 @@ func main() {
 	reader = r6
 	// *Reader satisfies the io.Reader interface because it has a .Read() method
 
-
 	///////////////////
 	// Using Readers
 	///////////////////
@@ -78,7 +85,6 @@ func main() {
 	numberOfBytesRead, err := someReader.Read(p)
 	// this returns how many bytes were read and any error
 	fmt.Println(numberOfBytesRead, err)
-
 
 	// can get all the raw []byte data out of reader using ioutil.ReadAll
 	reader = strings.NewReader("Hello")
@@ -97,5 +103,39 @@ func main() {
 	// ioutil.ReadAll loads the whole file into memory, which can become bad if multiple users do this
 	// eventually crashing due to lack of memory
 	// When you have a reader and are going to write to to a io.Writer, prefer io.Copy over ioutil.ReadAll
+
+	// io.Copy reads ALL bytes from an io.Reader, and writes it to an io.Writer
+	buffer := bytes.NewBuffer([]byte("something already in the buffer..."))
+	// buffer is a *Buffer which has .Read() and .Write() methods
+	file, err := os.Open("file.txt")
+	io.Copy(buffer, file)
+	fmt.Println(buffer)
+
+	// If building a package or utility (even if it’s an internal thing that nobody will ever see) 
+	// rather than taking in strings or []byte slices, consider taking in an io.Reader for data sources. 
+	// By doing so, your code will work with every type that implements io.Reader.
+
+	
+    // Can get data as a []byte from a file using ioutil.ReadFile
+	jsonStream, _ := ioutil.ReadFile("example.json")
+
+	//can create a new json decoder from an io.Reader
+	// json.NewDecoder takes an io.Reader as an input and returns a *Decoder
+	decoder := json.NewDecoder(bytes.NewReader(jsonStream))
+
+	foo := map[string]float64{}
+	decoder.Decode(&foo) // can decode without a struct to unmarshal into
+	fmt.Println(foo)
+
+	reader = bytes.NewReader(jsonStream)
+
+	doStuffWithReader(reader)
+
+}
+
+func doStuffWithReader(r io.Reader){
+
+	decoder := json.NewDecoder(r)
+	fmt.Println(decoder)
 
 }
