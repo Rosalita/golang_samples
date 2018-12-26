@@ -1,13 +1,21 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"strings"
-	"bytes"
 )
+
+type readingThing struct {
+}
+
+func (rt readingThing) Read(stuff []byte)(n int, err error){
+	return len(stuff), nil
+}
 
 func main() {
 
@@ -51,5 +59,43 @@ func main() {
 	r5 := bytes.Buffer{} // bytes.Buffer has .Read() and .Write() methods
 	reader = &r5
 	// r5 satisfies the io.Reader interface
+
+	r6 := bytes.NewReader([]byte{20,21,22})
+	// r6 is a *Reader
+	reader = r6
+	// *Reader satisfies the io.Reader interface because it has a .Read() method
+
+
+	///////////////////
+	// Using Readers
+	///////////////////
+
+	var someReader io.Reader
+	someReader = readingThing{} // reading thing has a method .Read() that returns number of bytes read and an error
+
+	// Probably the least useful thing is to read from a reader directly
+	p := []byte("this is some bytes")
+	numberOfBytesRead, err := someReader.Read(p)
+	// this returns how many bytes were read and any error
+	fmt.Println(numberOfBytesRead, err)
+
+
+	// can get all the raw []byte data out of reader using ioutil.ReadAll
+	reader = strings.NewReader("Hello")
+	b, err := ioutil.ReadAll(reader)
+	fmt.Println(b, string(b), err)
+
+	reader = bytes.NewReader([]byte{20,21,22})
+	b, err = ioutil.ReadAll(reader)
+	fmt.Println(b, string(b), err)
+
+	reader, _ = os.Open("file.txt")
+	b, err = ioutil.ReadAll(reader)
+	fmt.Println(b, string(b), err)
+
+	// However beware using ioutil.ReadAll on files if they are large, or have the potential to become large
+	// ioutil.ReadAll loads the whole file into memory, which can become bad if multiple users do this
+	// eventually crashing due to lack of memory
+	// When you have a reader and are going to write to to a io.Writer, prefer io.Copy over ioutil.ReadAll
 
 }
