@@ -1,2 +1,2 @@
 # golang_samples
-golang learning - Becuase Go is cool!
+golang learning - Because Go is cool!
