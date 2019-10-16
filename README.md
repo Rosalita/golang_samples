@@ -1,8 +1,6 @@
 # golang_samples
 golang learning - Because Go is cool!
 
-Katooooooooo
-
 Sumaya was here too
 
 Go for fun
