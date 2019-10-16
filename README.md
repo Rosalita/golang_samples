@@ -1,7 +1,7 @@
 # golang_samples
 golang learning - Because Go is cool!
 
-Kato was here 
+Kato was 
 
 Sumaya was here too
 
