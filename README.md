@@ -7,6 +7,7 @@ Go for fun
 
 Sinead loves to cheat
 Again...
-And again...
+
+And one more time.
 
 ![](https://cdn.chrisshort.net/testing-certificate-chains-in-go/GOPHER_MIC_DROP.png)
